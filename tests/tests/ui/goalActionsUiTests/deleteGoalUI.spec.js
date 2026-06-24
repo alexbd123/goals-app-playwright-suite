@@ -5,7 +5,7 @@ import { createTestGoal } from '../../../factories/goalFactory.js';
 import { request } from '@playwright/test';
 import { trackGoal, generateRandomTitle, generateRandomTimeframe } from '../../../api/beHelper.js';
 import { DeletedPage } from '../../../pages/DeletedPage.js';
-import { generatePermaDeleteGoalMessage } from '../uiTestData/uiMessages.js';
+import { dynamicUiMessages } from '../uiTestData/uiMessages.js';
 
 test.describe('Delete goals UI test', () => {
 
@@ -25,11 +25,13 @@ test.describe('Delete goals UI test', () => {
                 is_completed: 1
             }));
             trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
+            const { tempDeleteGoalMessage } = dynamicUiMessages(createdGoal.title);
             const homePage = new HomePage(page);
             const deletedPage = new DeletedPage(page);
             await homePage.goToHomeAndWaitForCompletedGoal(createdGoal.title);
 
             homePage.clickTempDeleteButton(createdGoal.id);
+            await expect(deletedPage.deleteOrRestoreAlert).toHaveText(tempDeleteGoalMessage);
             await expect(homePage.incompleteGoalsList.getByText(createdGoal.title)).not.toBeVisible()
             await expect(homePage.completedGoalsList.getByText(createdGoal.title)).not.toBeVisible()
             await deletedPage.goTo();
@@ -48,13 +50,13 @@ test.describe('Delete goals UI test', () => {
                 is_deleted: 1
             }));
             trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
-            const expectedPermaDeleteMessage = generatePermaDeleteGoalMessage(createdGoal.title);
+            const { permaDeleteGoalMessage } = dynamicUiMessages(createdGoal.title);
             const homePage = new HomePage(page);
             const deletedPage = new DeletedPage(page);
             await deletedPage.goToDeletedAndWaitForTempDeletedGoal(createdGoal.title);
 
             await deletedPage.permaDeleteGoal(createdGoal.id);
-            await expect(deletedPage.deleteOrRestoreAlert).toHaveText(expectedPermaDeleteMessage);
+            await expect(deletedPage.deleteOrRestoreAlert).toHaveText(permaDeleteGoalMessage);
             await expect(deletedPage.deletedGoalsList.getByText(createdGoal.title)).not.toBeVisible()
         });
 

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../../../pages/HomePage.js';
-import { generateExpectedCreationSuccessMessage } from '../uiTestData/uiMessages.js';
-import { generateRandomTitleTimeframe } from '../../../api/beHelper.js';
+import { dynamicUiMessages } from '../uiTestData/uiMessages.js';
+import { generateRandomTitleTimeframe, deleteGoalByTitle } from '../../../api/beHelper.js';
 
 test.describe('Create goals UI tests', () => {
     test.beforeEach(async ({ page }) => {
@@ -9,14 +9,15 @@ test.describe('Create goals UI tests', () => {
         await homePage.goTo();
     });
 
-    test('Create new goal', async ({ page }) => {
+    test('Create new goal', async ({ request, page }) => {
         const homePage = new HomePage(page);
         const { randomTitle, randomTimeframe } = generateRandomTitleTimeframe();
-        const expectedSuccessMessage = generateExpectedCreationSuccessMessage(randomTitle, randomTimeframe);
+
+        const { creationSuccessMessage } = dynamicUiMessages(randomTitle, randomTimeframe);
         await homePage.addGoal(randomTitle, randomTimeframe);
         await expect(homePage.incompleteGoalsList.getByText(randomTitle)).toBeVisible();
-        await expect(homePage.goalSubmissionMessage(expectedSuccessMessage)).toBeVisible();
+        await expect(homePage.goalSubmissionMessage(creationSuccessMessage)).toBeVisible();
 
-        await homePage.deleteTestGoalFromUi(randomTitle)
+        await deleteGoalByTitle(request, randomTitle);
     });
 });

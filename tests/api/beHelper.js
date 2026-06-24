@@ -1,5 +1,5 @@
 import { expect } from '../fixtures.js';
-import { getAllGoalsAndReturn } from './requests.js';
+import { getAllGoalsAndReturn, deleteGoalAndReturn } from './requests.js';
 
 export function trackGoal(
   goalIdsForTeardown,
@@ -24,4 +24,24 @@ export function generateRandomTitleTimeframe() {
     randomTitle: generateRandomTitle(),
     randomTimeframe: generateRandomTimeframe()
   };
+}
+
+export async function deleteAllGoals(request) {
+  const { goals, status } = await getAllGoalsAndReturn(request);
+  expect(status).toBe(200);
+  for (const goal of goals) {
+    const { deletedStatus } = await deleteGoalAndReturn(request, goal.id)
+    expect(deletedStatus).toBe(200);
+  };
+}
+
+export async function deleteGoalByTitle(request, title) {
+  const { goals, status } = await getAllGoalsAndReturn(request);
+  expect(status).toBe(200);
+  for (const goal of goals) {
+    if (goal.title === title) {
+    const { deletedStatus } = await deleteGoalAndReturn(request, goal.id)
+    expect(deletedStatus).toBe(200);
+    }
+  }
 }

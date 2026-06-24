@@ -7,11 +7,15 @@ export class HomePage {
         this.newGoalTimeframeInput = page.getByPlaceholder('Enter timeframe here...');
         this.addGoalButton = page.getByRole('button', { name: 'Submit new goal' });
         this.incompleteGoalsList = page.getByTestId('incomplete-goals-list');
+        this.incompleteGoalsListHeading = page.getByRole('heading', {name: 'To-Do:' });
         this.completedGoalsList = page.getByTestId('completed-goals-list');
+        this.completedGoalsListHeading = page.getByRole('heading', {name: 'Completed:' });
         this.goalSubmissionAlert = page.getByRole('alert');
         this.editGoalTitleInput = page.getByTestId('edit-title-input');
         this.editGoalTimeframeInput = page.getByTestId('edit-timeframe-input');
         this.submitEditButton = page.getByTestId('submit-edit-btn');
+        this.noIncompleteGoalsMessage = page.locator(".incomplete-message");
+        this.noCompletedGoalsMessage = page.locator(".completed-message")
     }
 
     async goTo() {
@@ -101,12 +105,5 @@ export class HomePage {
     async goToHomeAndWaitForCompletedGoal(title) {
         await this.goTo();
         await expect(this.completedGoalsList.getByText(title)).toBeVisible();
-    }
-
-    //Temporary until Deleted Goals page is made
-    async deleteTestGoalFromUi(title) {
-        await this.toggleCompleteByTitle(title);
-        await this.tempDeleteGoalByTitle(title);
-        await expect(this.incompleteGoalsList.getByText(title)).not.toBeVisible();
     }
 };

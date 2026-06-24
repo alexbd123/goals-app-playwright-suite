@@ -9,9 +9,11 @@ import {
     generateRandomTimeframe,
     generateRandomTitleTimeframe
 } from '../../../api/beHelper.js';
-import { returnInvalidTitleTimeframeEditMessage } from '../uiTestData/uiMessages.js';
+import { staticUiMessages } from '../uiTestData/uiMessages.js';
 
 test.describe('Update goals UI tests', () => {
+
+    const { invalidTitleTimeframeEditMessage } = staticUiMessages();
 
     test.afterEach(async ({ request, goalIdsForTeardown }) => {
         for (const goalId of goalIdsForTeardown) {
@@ -80,7 +82,7 @@ test.describe('Update goals UI tests', () => {
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
             await homePage.updateGoal(createdGoal.id, " ", undefined);
-            await expect(homePage.goalSubmissionAlert).toHaveText(returnInvalidTitleTimeframeEditMessage());
+            await expect(homePage.goalSubmissionAlert).toHaveText(invalidTitleTimeframeEditMessage);
             await expect(homePage.goalCardTitle(createdGoal.id)).toHaveText(createdGoal.title);
         });
 
@@ -94,7 +96,7 @@ test.describe('Update goals UI tests', () => {
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
             await homePage.updateGoal(createdGoal.id, undefined, " ");
-            await expect(homePage.goalSubmissionAlert).toHaveText(returnInvalidTitleTimeframeEditMessage());
+            await expect(homePage.goalSubmissionAlert).toHaveText(invalidTitleTimeframeEditMessage);
             await expect(homePage.goalCardTimeframe(createdGoal.id)).toHaveText(createdGoal.timeframe);
         });
 
