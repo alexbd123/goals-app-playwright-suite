@@ -1,12 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../../fixtures.js';
 import { HomePage } from '../../../pages/HomePage.js';
 import { createGoalAndReturn, deleteGoalAndReturn } from '../../../api/requests.js';
 import { createTestGoal } from '../../../factories/goalFactory.js';
 import { request } from '@playwright/test';
 import {
-    addGoalIdToTeardownIfSuccess,
-    getGoalIdsForTeardown,
-    clearGoalIdsForTeardown,
+    trackGoal,
     generateRandomTitle,
     generateRandomTimeframe,
     generateRandomTitleTimeframe
@@ -15,25 +13,21 @@ import { returnInvalidTitleTimeframeEditMessage } from '../uiTestData/uiMessages
 
 test.describe('Update goals UI tests', () => {
 
-    let goalIdsForTeardown = [];
-
-    test.afterEach(async ({ request }) => {
-        for (const goalId of getGoalIdsForTeardown()) {
-            const { deletedStatus } =
-                await deleteGoalAndReturn(request, goalId);
+    test.afterEach(async ({ request, goalIdsForTeardown }) => {
+        for (const goalId of goalIdsForTeardown) {
+            const { deletedMessage, deletedStatus } = await deleteGoalAndReturn(request, goalId)
             expect(deletedStatus).toBe(200);
-        }
-        clearGoalIdsForTeardown();
+        };
     });
 
     test.describe('Positive update goals UI tests', () => {
 
-        test('User can update a goal with a new title and timeframe', async ({ page, request }) => {
+        test('User can update a goal with a new title and timeframe', async ({ page, request, goalIdsForTeardown }) => {
             const { createdGoal, createdStatus } = await createGoalAndReturn(request, createTestGoal({
                 title: generateRandomTitle(),
                 timeframe: generateRandomTimeframe()
             }));
-            addGoalIdToTeardownIfSuccess(createdGoal, createdStatus);
+            trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
             const homePage = new HomePage(page);
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
             const { randomTitle, randomTimeframe } = generateRandomTitleTimeframe();
@@ -43,12 +37,12 @@ test.describe('Update goals UI tests', () => {
             await expect(homePage.goalCardTimeframe(createdGoal.id)).toHaveText(randomTimeframe);
         });
 
-        test('User can update goal with only a new title', async ({ page, request }) => {
+        test('User can update goal with only a new title', async ({ page, request, goalIdsForTeardown }) => {
             const { createdGoal, createdStatus } = await createGoalAndReturn(request, createTestGoal({
                 title: generateRandomTitle(),
                 timeframe: generateRandomTimeframe()
             }));
-            addGoalIdToTeardownIfSuccess(createdGoal, createdStatus);
+            trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
             const homePage = new HomePage(page);
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
@@ -58,12 +52,12 @@ test.describe('Update goals UI tests', () => {
             await expect(homePage.goalCardTimeframe(createdGoal.id)).toHaveText(createdGoal.timeframe);
         });
 
-        test('User can update goal with only a new timeframe', async ({ page, request }) => {
+        test('User can update goal with only a new timeframe', async ({ page, request, goalIdsForTeardown }) => {
             const { createdGoal, createdStatus } = await createGoalAndReturn(request, createTestGoal({
                 title: generateRandomTitle(),
                 timeframe: generateRandomTimeframe()
             }));
-            addGoalIdToTeardownIfSuccess(createdGoal, createdStatus);
+            trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
             const homePage = new HomePage(page);
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
@@ -75,12 +69,13 @@ test.describe('Update goals UI tests', () => {
     })
 
     test.describe('Negative update goals UI tests', () => {
-        test('Cannot update goal when title is empty space', async ({ page, request }) => {
+
+        test('Cannot update goal when title is empty space', async ({ page, request, goalIdsForTeardown }) => {
             const { createdGoal, createdStatus } = await createGoalAndReturn(request, createTestGoal({
                 title: generateRandomTitle(),
                 timeframe: generateRandomTimeframe()
             }));
-            addGoalIdToTeardownIfSuccess(createdGoal, createdStatus);
+            trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
             const homePage = new HomePage(page);
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
@@ -89,12 +84,12 @@ test.describe('Update goals UI tests', () => {
             await expect(homePage.goalCardTitle(createdGoal.id)).toHaveText(createdGoal.title);
         });
 
-        test('Cannot update goal when timeframe is empty space', async ({ page, request }) => {
+        test('Cannot update goal when timeframe is empty space', async ({ page, request, goalIdsForTeardown }) => {
             const { createdGoal, createdStatus } = await createGoalAndReturn(request, createTestGoal({
                 title: generateRandomTitle(),
                 timeframe: generateRandomTimeframe()
             }));
-            addGoalIdToTeardownIfSuccess(createdGoal, createdStatus);
+            trackGoal(goalIdsForTeardown, createdGoal, createdStatus);
             const homePage = new HomePage(page);
             await homePage.goToHomeAndWaitForIncompleteGoal(createdGoal.title);
 
@@ -102,5 +97,6 @@ test.describe('Update goals UI tests', () => {
             await expect(homePage.goalSubmissionAlert).toHaveText(returnInvalidTitleTimeframeEditMessage());
             await expect(homePage.goalCardTimeframe(createdGoal.id)).toHaveText(createdGoal.timeframe);
         });
+
     })
 });
