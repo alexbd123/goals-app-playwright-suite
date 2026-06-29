@@ -40,6 +40,16 @@ export class HomePage {
         await this.clickSubmitNewGoal();
     }
 
+    async tryToAddGoalWithoutTitle(timeframe) {
+        await this.addTimeframe(timeframe);
+        await this.clickSubmitNewGoal();
+    }
+
+    async tryToAddGoalWithoutTimeframe(title) {
+        await this.addTitle(title);
+        await this.clickSubmitNewGoal();
+    }
+
     goalCardById(goalId) {
         return this.page.getByTestId(`goal-card-${goalId}`);
     }
@@ -104,6 +114,7 @@ export class HomePage {
 
     async goToHomeAndWaitForCompletedGoal(title) {
         await this.goTo();
+        await expect(this.completedGoalsList).toBeVisible();
         await expect(this.completedGoalsList.getByText(title)).toBeVisible();
     }
 };

@@ -40,8 +40,15 @@ export async function deleteGoalByTitle(request, title) {
   expect(status).toBe(200);
   for (const goal of goals) {
     if (goal.title === title) {
-    const { deletedStatus } = await deleteGoalAndReturn(request, goal.id)
-    expect(deletedStatus).toBe(200);
+      const { deletedStatus } = await deleteGoalAndReturn(request, goal.id)
+      expect(deletedStatus).toBe(200);
     }
   }
+}
+
+export async function runBackendTeardown(request, goalIdsForTeardown) {
+  for (const goalId of goalIdsForTeardown) {
+    const { deletedMessage, deletedStatus } = await deleteGoalAndReturn(request, goalId)
+    expect(deletedStatus).toBe(200);
+  };
 }

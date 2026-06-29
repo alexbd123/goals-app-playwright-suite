@@ -9,13 +9,11 @@ export class NavBar {
         this.deletedGoalsPageUrl = 'http://localhost:5173/deleted';
     }
 
-    async navigateToHome() {
+    async clickHomeLink() {
         await this.homeLink.click();
-        await expect(this.page).toHaveURL(this.homePageUrl);
     }
 
-    async navigateToDeletedGoals() {
+    async clickDeletedGoalsLink() {
         await this.deletedGoalsLink.click();
-        await expect(this.page).toHaveURL(this.deletedGoalsPageUrl);
     }
 };

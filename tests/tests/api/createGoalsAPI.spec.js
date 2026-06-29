@@ -2,21 +2,15 @@ import { test, expect } from '../../fixtures.js';
 import { createGoalAndReturn, deleteGoalAndReturn } from '../../api/requests.js';
 import { createTestGoal } from '../../factories/goalFactory.js';
 import { provideResponseMessages } from './apiTestData/responseMessages.js';
-import { trackGoal } from '../../api/beHelper.js';
+import { trackGoal, runBackendTeardown } from '../../api/beHelper.js';
 
 test.describe('API goal actions tests', () => {
 
     test.afterEach(async ({ request, goalIdsForTeardown }) => {
-        for (const goalId of goalIdsForTeardown) {
-            const { deletedMessage, deletedStatus } = await deleteGoalAndReturn(request, goalId)
-            expect(deletedStatus).toBe(200);
-        };
+        await runBackendTeardown(request, goalIdsForTeardown);
     });
 
     const {
-        deleteSuccessMessage,
-        invalidGoalIdMessage,
-        nonExistentIdMessage,
         emptyTitleOrTimeframeUpdateMessage,
         invalidUpdatePayloadMessage,
         invalidCompletionValueMessage
@@ -65,7 +59,7 @@ test.describe('API goal actions tests', () => {
             expect(createdStatus).toBe(400);
             expect(createdGoal.error).toBe(emptyTitleOrTimeframeUpdateMessage);
         })
-        
+
     });
 });
 

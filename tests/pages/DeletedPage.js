@@ -22,7 +22,7 @@ export class DeletedPage {
     }
 
     goalCardRestoreButton(goalId) {
-        return this.page.getByTestId(`restore-goal-${goal.id}`);
+        return this.page.getByTestId(`restore-goal-${goalId}`);
 
     }
 
@@ -37,6 +37,10 @@ export class DeletedPage {
 
     async permaDeleteGoal(goalId) {
         await this.goalCardPermaDeleteButton(goalId).click();
+    }
+
+    async restoreGoal(goalId) {
+        await this.goalCardRestoreButton(goalId).click();
     }
 
 }

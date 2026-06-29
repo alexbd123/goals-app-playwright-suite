@@ -7,7 +7,7 @@ import {
 } from '../../api/requests.js';
 import { createTestGoal } from '../../factories/goalFactory.js';
 import { provideResponseMessages } from './apiTestData/responseMessages.js';
-import { trackGoal } from '../../api/beHelper.js';
+import { trackGoal, runBackendTeardown } from '../../api/beHelper.js';
 
 test.describe('GET goals tests', () => {
 
@@ -17,10 +17,7 @@ test.describe('GET goals tests', () => {
     } = provideResponseMessages();
 
     test.afterEach(async ({ request, goalIdsForTeardown }) => {
-        for (const goalId of goalIdsForTeardown) {
-            const { deletedMessage, deletedStatus } = await deleteGoalAndReturn(request, goalId)
-            expect(deletedStatus).toBe(200);
-        };
+        await runBackendTeardown(request, goalIdsForTeardown);
     });
 
 
